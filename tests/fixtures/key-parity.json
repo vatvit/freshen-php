@@ -1,0 +1,181 @@
+[
+    {
+        "name": "simple-string-id",
+        "domain": "product",
+        "facet": "top-sellers",
+        "id": "sku-1",
+        "schemaVersion": null,
+        "locale": null,
+        "key": "product/top-sellers/sku-1",
+        "prefix": "product/top-sellers",
+        "idString": "sku-1",
+        "segments": [
+            "product",
+            "top-sellers",
+            "sku-1"
+        ]
+    },
+    {
+        "name": "int-id",
+        "domain": "product",
+        "facet": "top-sellers",
+        "id": 42,
+        "schemaVersion": null,
+        "locale": null,
+        "key": "product/top-sellers/42",
+        "prefix": "product/top-sellers",
+        "idString": "42",
+        "segments": [
+            "product",
+            "top-sellers",
+            "42"
+        ]
+    },
+    {
+        "name": "schema-and-locale",
+        "domain": "product",
+        "facet": "detail",
+        "id": "sku-1",
+        "schemaVersion": "v2",
+        "locale": "en_US",
+        "key": "product/detail/v2/en_US/sku-1",
+        "prefix": "product/detail/v2/en_US",
+        "idString": "sku-1",
+        "segments": [
+            "product",
+            "detail",
+            "v2",
+            "en_US",
+            "sku-1"
+        ]
+    },
+    {
+        "name": "schema-only",
+        "domain": "product",
+        "facet": "detail",
+        "id": "sku-1",
+        "schemaVersion": "v3",
+        "locale": null,
+        "key": "product/detail/v3/sku-1",
+        "prefix": "product/detail/v3",
+        "idString": "sku-1",
+        "segments": [
+            "product",
+            "detail",
+            "v3",
+            "sku-1"
+        ]
+    },
+    {
+        "name": "locale-only",
+        "domain": "product",
+        "facet": "detail",
+        "id": "sku-1",
+        "schemaVersion": null,
+        "locale": "fr_FR",
+        "key": "product/detail/fr_FR/sku-1",
+        "prefix": "product/detail/fr_FR",
+        "idString": "sku-1",
+        "segments": [
+            "product",
+            "detail",
+            "fr_FR",
+            "sku-1"
+        ]
+    },
+    {
+        "name": "urlencode-space-slash",
+        "domain": "shop",
+        "facet": "items",
+        "id": "a b/c",
+        "schemaVersion": null,
+        "locale": null,
+        "key": "shop/items/a%20b%2Fc",
+        "prefix": "shop/items",
+        "idString": "a b/c",
+        "segments": [
+            "shop",
+            "items",
+            "a b/c"
+        ]
+    },
+    {
+        "name": "urlencode-unicode",
+        "domain": "shop",
+        "facet": "items",
+        "id": "café",
+        "schemaVersion": null,
+        "locale": null,
+        "key": "shop/items/caf%C3%A9",
+        "prefix": "shop/items",
+        "idString": "café",
+        "segments": [
+            "shop",
+            "items",
+            "café"
+        ]
+    },
+    {
+        "name": "array-id",
+        "domain": "product",
+        "facet": "list",
+        "id": {
+            "b": 2,
+            "a": 1
+        },
+        "schemaVersion": null,
+        "locale": null,
+        "key": "product/list/j%3AeyJhIjoxLCJiIjoyfQ",
+        "prefix": "product/list",
+        "idString": "j:eyJhIjoxLCJiIjoyfQ",
+        "segments": [
+            "product",
+            "list",
+            "j:eyJhIjoxLCJiIjoyfQ"
+        ]
+    },
+    {
+        "name": "array-id-nested",
+        "domain": "product",
+        "facet": "list",
+        "id": {
+            "z": {
+                "y": 1,
+                "x": 2
+            },
+            "a": 3
+        },
+        "schemaVersion": "v1",
+        "locale": "en",
+        "key": "product/list/v1/en/j%3AeyJhIjozLCJ6Ijp7IngiOjIsInkiOjF9fQ",
+        "prefix": "product/list/v1/en",
+        "idString": "j:eyJhIjozLCJ6Ijp7IngiOjIsInkiOjF9fQ",
+        "segments": [
+            "product",
+            "list",
+            "v1",
+            "en",
+            "j:eyJhIjozLCJ6Ijp7IngiOjIsInkiOjF9fQ"
+        ]
+    },
+    {
+        "name": "array-id-scalars",
+        "domain": "search",
+        "facet": "results",
+        "id": {
+            "q": "shoes",
+            "page": 2,
+            "sort": "price"
+        },
+        "schemaVersion": null,
+        "locale": null,
+        "key": "search/results/j%3AeyJwYWdlIjoyLCJxIjoic2hvZXMiLCJzb3J0IjoicHJpY2UifQ",
+        "prefix": "search/results",
+        "idString": "j:eyJwYWdlIjoyLCJxIjoic2hvZXMiLCJzb3J0IjoicHJpY2UifQ",
+        "segments": [
+            "search",
+            "results",
+            "j:eyJwYWdlIjoyLCJxIjoic2hvZXMiLCJzb3J0IjoicHJpY2UifQ"
+        ]
+    }
+]
