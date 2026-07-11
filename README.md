@@ -8,18 +8,51 @@
 
 # Freshen (PHP)
 
+> **Finally, full control over your caching — in one library.**
+
 [![Packagist Version](https://img.shields.io/packagist/v/vatvit/freshen-php)](https://packagist.org/packages/vatvit/freshen-php)
 [![PHP Version](https://img.shields.io/packagist/php-v/vatvit/freshen-php)](https://packagist.org/packages/vatvit/freshen-php)
 [![License](https://img.shields.io/packagist/l/vatvit/freshen-php)](https://github.com/vatvit/freshen/blob/main/LICENSE)
 
-> **Security** — tracked by the [Packagist security advisory database](https://packagist.org/packages/vatvit/freshen-php); run `composer audit` to check your install. Report privately via [GitHub Security Advisories](https://github.com/vatvit/freshen/security/advisories); policy in [SECURITY.md](https://github.com/vatvit/freshen/blob/main/SECURITY.md).
+Freshen brings together the caching pieces you normally wire up by hand: **single-flight**
+recompute so exactly one worker rebuilds a hot key while everyone else is served the last
+good value (**no cache-stampede**); **preemptive refresh** that recomputes an entry *before*
+it goes stale, on TTLs and jitter you control; **structured keys** and **effective delete**
+— genuinely evict one exact key or a whole prefix, atomically and in one round-trip; and
+**built-in metrics** on every hit, miss, and rebuild. Wrap any expensive
+read — a database query, an API call, a rendered fragment — and every cache-related decision
+is explicit and yours. Runs natively on **PHP 8.1 → 8.4**
+([`COMPATIBILITY.md`](https://github.com/vatvit/freshen/blob/main/COMPATIBILITY.md)).
 
-PHP implementation of **Freshen** — a **stale-while-revalidate** cache with
-**cache-stampede prevention** (single-flight leader/follower recompute + jittered
-TTLs) and **built-in metrics**.
+## Features
 
-Runs natively on **PHP 8.1 → 8.4** (single source, no downgrade build). See
-[`COMPATIBILITY.md`](https://github.com/vatvit/freshen/blob/main/COMPATIBILITY.md).
+- **Stale-while-revalidate** — serve the cached value instantly and recompute a fresh one
+  in the background; reads never block on an expired entry.
+- **Cache-stampede prevention** — single-flight leader/follower recompute plus jittered
+  TTLs: one worker rebuilds while everyone else is served the stale value (no thundering herd).
+- **Async invalidation & refresh** — `invalidate()` / `refresh()` are non-blocking by
+  default (PSR-14 events, handled off the call site); pass `SyncMode::SYNC` to run inline.
+- **Structured, hierarchical keys** — `Freshen\Key` is `domain / facet [ / schemaVersion ]
+  [ / locale ] / id`, with built-in schema **versioning** and **per-locale** variants.
+- **Effective delete** — genuinely evict one exact key, a whole **prefix**
+  (`domain/facet/*`), or a **batch** of selectors — atomically, in a single round-trip (a
+  real delete, not just a TTL bump).
+- **Redis-backed, PSR-6 core** — an atomic Redis driver (single-flight + exact/prefix
+  delete) over a Stash PSR-6 pool; swap in any PSR-6 backend.
+- **Built-in metrics & fail-open** — hit/miss/recompute metrics out of the box, and it
+  serves through backend hiccups instead of failing the request.
+- **Modern, typed PHP** — native PHP 8.1 → 8.4 (single source, no downgrade build),
+  PHPStan-max, MIT.
+
+## Framework bridges
+
+On **Symfony** or **Laravel**? Skip the wiring — a drop-in bridge gives you everything above
+from declarative config (`composer require` and you're done):
+
+| Framework | Package | Docs |
+|-----------|---------|------|
+| Symfony `^6.4 \|\| ^7.0` | [`vatvit/freshen-symfony`](https://packagist.org/packages/vatvit/freshen-symfony) | [bridge README](../symfony/README.md) |
+| Laravel `^11 \|\| ^12` (PHP 8.2+) | [`vatvit/freshen-laravel`](https://packagist.org/packages/vatvit/freshen-laravel) | [bridge README](../laravel/README.md) |
 
 ## At a glance
 
@@ -46,13 +79,8 @@ for you), and `isMiss()` even tells a cached `null` apart from an absent entry.
 
 ## Install
 
-> **Pre-1.0 — release candidate.** The public API may still change before `1.0.0`
-> (see [`COMPATIBILITY.md`](https://github.com/vatvit/freshen/blob/main/COMPATIBILITY.md)). Until a stable tag ships,
-> require the RC explicitly (Composer's default `minimum-stability` is `stable`, so
-> a bare `require` won't resolve an RC):
-
 ```bash
-composer require vatvit/freshen-php:^1.0@rc      # or a pinned :1.0.0-rc.2
+composer require vatvit/freshen-php
 ```
 
 Requires a [PSR-6](https://www.php-fig.org/psr/psr-6/) cache pool
@@ -349,16 +377,8 @@ standards you already use, so wire it like any other service:
 
 ## Framework integration
 
-**Use a bridge — `composer require` and you're done.** Drop-in packages wire the pool,
-loader, jitter and async listeners from declarative config so you don't hand-wire
-anything:
-
-| Framework | Package | Docs |
-|-----------|---------|------|
-| Symfony `^6.4 \|\| ^7.0` | [`vatvit/freshen-symfony`](https://packagist.org/packages/vatvit/freshen-symfony) | [bridge README](../symfony/README.md) |
-| Laravel `^11 \|\| ^12` (PHP 8.2+) | [`vatvit/freshen-laravel`](https://packagist.org/packages/vatvit/freshen-laravel) | [bridge README](../laravel/README.md) |
-
-Three principles hold whichever path you take: (1) Freshen needs a **Stash** pool (not the
+Prefer a **[drop-in bridge](#framework-bridges)** on Symfony or Laravel — it wires all of
+this for you. Three principles hold whichever path you take: (1) Freshen needs a **Stash** pool (not the
 framework's own PSR-6 pool); (2) async needs a **PSR-14** dispatcher — **Symfony's is**
 PSR-14, **Laravel's is not** (its bridge ships a PSR-14 adapter + queue); and (3) **a
 `Cache` is per-dataset** — one loader, its own TTLs. A second dataset is a second loader +
@@ -412,6 +432,13 @@ database — every key, not just cached ones — so Freshen does not expose it. 
 by key or prefix with `invalidate()` / `invalidateExact()` instead.
 
 The cross-language behaviour contract is [`docs/PARITY.md`](https://github.com/vatvit/freshen/blob/main/docs/PARITY.md).
+
+## Security
+
+Tracked by the [Packagist security advisory database](https://packagist.org/packages/vatvit/freshen-php)
+— run `composer audit` to check your install. Report vulnerabilities privately via
+[GitHub Security Advisories](https://github.com/vatvit/freshen/security/advisories); the full
+policy is in [SECURITY.md](https://github.com/vatvit/freshen/blob/main/SECURITY.md).
 
 ## Develop / contribute
 
